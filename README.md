@@ -49,7 +49,7 @@ A Forge-Neo post-processing extension that ports a ComfyUI SeedVR2 tiled-image w
 5. Restart Forge-Neo and open the post-processing / Extras interface. Enable the
    **SeedVR2 Upscaler** accordion.
 
-## RTX 3090 preset
+## preset
 
 Use the defaults first:
 
@@ -66,31 +66,3 @@ Use the defaults first:
 If the encoding or decoding phase runs out of VRAM, enable VAE tiled encode/decode.
 If the DiT phase runs out of VRAM, set DiT offload to `cpu` before enabling BlockSwap.
 
-## Important host dependency policy
-
-Forge-Neo owns its PyTorch stack and pins several Python libraries. Upstream SeedVR2
-has its own requirements. This extension intentionally reuses the Forge environment
-instead of blindly installing SeedVR2's entire `requirements.txt`, because replacing
-Forge's `torch`/`torchvision`/`numpy` can break the WebUI.
-
-In particular, current Forge-Neo pins an OmegaConf version older than the minimum
-listed by upstream SeedVR2. The installer preserves the host version instead of
-silently upgrading a Forge-pinned package. If this becomes a real runtime incompatibility
-on your checkout, solve it in the adapter rather than globally upgrading Forge first.
-
-## Offline smoke test
-
-From the extension directory:
-
-`python tests/smoke_test.py`
-
-This validates the 6080 calculation and TTP-equivalent split/merge logic. It does not
-load CUDA models.
-
-## Known limitation of this build
-
-The adapter has been matched against the official SeedVR2 v2.5.23 core function
-signatures and passes local syntax/tiling smoke tests. End-to-end GPU inference cannot
-be executed in the build environment because the multi-GB SeedVR2 weights and an RTX
-GPU are not present here. The first real Forge run on your machine is therefore the
-final integration test for model-loading/runtime-library compatibility.
