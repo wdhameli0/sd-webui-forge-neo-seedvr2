@@ -21,9 +21,18 @@ from seedvr2_forge.config import SeedVR2Config
 from seedvr2_forge.tiling import _axis_boxes, merge_tiles, split_image
 
 
-def test_workflow_target() -> None:
-    cfg = SeedVR2Config()
-    assert cfg.target_long_edge() == 6080, cfg.target_long_edge()
+def test_scale_targets() -> None:
+    cfg = SeedVR2Config(scale_mode="2x")
+    assert cfg.resolve_target_long_edge((1024, 1536)) == 3072
+    cfg.scale_mode = "3x"
+    assert cfg.resolve_target_long_edge((1024, 1536)) == 4608
+    cfg.scale_mode = "4x"
+    assert cfg.resolve_target_long_edge((1024, 1536)) == 6144
+    cfg.scale_mode = "workflow_6k"
+    assert cfg.resolve_target_long_edge((1024, 1536)) == 6080
+    cfg.scale_mode = "custom"
+    cfg.custom_long_edge = 5000
+    assert cfg.resolve_target_long_edge((1024, 1536)) == 5000
 
 
 def test_ttp_equivalent_6080_grid() -> None:
@@ -58,7 +67,7 @@ def test_split_merge_roundtrip() -> None:
 
 
 if __name__ == "__main__":
-    test_workflow_target()
+    test_scale_targets()
     test_ttp_equivalent_6080_grid()
     test_split_merge_roundtrip()
     print("[PASS] SeedVR2 Forge offline smoke tests")

@@ -4,7 +4,7 @@ SeedVR2 image restoration / upscaling extension for **SD WebUI Forge Neo**.
 
 This extension integrates the official SeedVR2 core directly into Forge-Neo's post-processing pipeline. It does **not** require ComfyUI or ComfyUI custom nodes.
 
-> Current plugin version: **v0.3.0**
+> Current plugin version: **v0.3.1**
 
 ---
 
@@ -392,7 +392,17 @@ If you change tile size, avoid setting blend padding to zero unless you are inte
 
 ---
 
-## Changelog — v0.3.0
+## Changelog — v0.3.1
+
+- **Final-output-only mode is now enabled by default**
+- SeedVR2 now runs before Forge's built-in Upscale by default
+- When final-output-only mode is enabled, later Forge postprocessors are skipped to prevent a second resize
+- The original input image is preserved during Forge's first-pass stage, so SeedVR2倍率 is calculated from the true source image even when the user customizes postprocessing order
+- Stale Forge Upscale metadata is removed from the final SeedVR2 result
+- Renamed the basic control from “放大倍率 / 输出尺寸” to **“最终输出倍率”**
+- Added a clear UI hint that Forge Upscale is not required when SeedVR2 handles the final output
+
+### v0.3.0
 
 - Added automatic SeedVR2 model scanning
 - Added FP16 / FP8 / GGUF model selection
@@ -432,3 +442,17 @@ When reporting an issue, please include:
 - VAE filename
 - Upscale mode
 - Relevant console log / traceback
+
+## Why do I get two different output sizes?
+
+Starting with **v0.3.1**, keep **“仅输出最终 SeedVR2 图像 / Final SeedVR2 output only”** enabled.
+
+SeedVR2 will then use the original input image, produce the selected final resolution, and stop Forge's later Upscale/postprocessing chain. You do **not** need to enable Forge's built-in Upscale at the same time.
+
+Example:
+
+```text
+Input: 1024 × 1536
+Final output: 4×
+Result: 4096 × 6144 only
+```
